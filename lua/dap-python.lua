@@ -245,6 +245,7 @@ function M.setup(python_path, opts)
   local dap = load_dap()
   python_path = python_path and vim.fn.expand(vim.fn.trim(python_path), true) or 'python3'
   opts = vim.tbl_extend('keep', opts or {}, default_setup_opts)
+  local basename = vim.fn.fnamemodify(python_path, ":t")
   dap.adapters.python = function(cb, config)
     if config.request == 'attach' then
       ---@diagnostic disable-next-line: undefined-field
@@ -266,7 +267,6 @@ function M.setup(python_path, opts)
     else
       ---@type dap.ExecutableAdapter
       local adapter
-      local basename = vim.fn.fnamemodify(python_path, ":t")
       if basename == "uv" then
         adapter = {
           type = "executable",
@@ -356,6 +356,17 @@ function M.setup(python_path, opts)
       console = opts.console,
       pythonPath = opts.pythonPath,
     })
+    -- ── NEW: PEP 723 inline-script support when using uv ──
+    if basename == "uv" then
+      table.insert(configs, {
+        type = 'python';
+        request = 'launch';
+        name = 'script (PEP723)';
+        program = '${file}';
+        console = opts.console;
+        python = { python_path, "run", "--with-requirements", "${file}", "python" };
+      })
+    end
   end
 end
 
