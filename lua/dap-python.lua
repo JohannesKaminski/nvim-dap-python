@@ -364,7 +364,8 @@ function M.setup(python_path, opts)
         name = 'script (PEP723)';
         program = '${file}';
         console = opts.console;
-        python = { python_path, "run", "--with-requirements", "${file}", "python" };
+        python =  python_path;
+        pythonArgs = { "run", "--with-requirements", "${file}", "python" };
       })
     end
   end
